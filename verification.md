@@ -77,8 +77,14 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
 
 ## 6. Mi revisión personal
 
-<!-- Completar con lo que hice yo directamente. Solo escribir lo que realmente hice. -->
-
-- Fecha:
-- Qué comprobé por mi cuenta (rutas que abrí, comandos que ejecuté y qué vi):
+- Fecha: 2026-11-11
+- Qué comprobé por mi cuenta:
+  - Abrí http://localhost:8000/docs y vi la documentación de los endpoints de la API.
+  - Abrí http://localhost:5173 y vi el dashboard con los KPIs y los gráficos cargando datos del backend.
+  - Levanté el backend sin Docker. Mi primer `pip install` se instaló en el Python global en vez de en el `.venv`; con el agente detectamos el problema y dejamos las dependencias en el `.venv` para arrancar `uvicorn`.
+  - Me encontré con el bloqueo de PowerShell al activar el `.venv` y al usar `npm`, y lo resolví cambiando la política de ejecución.
+  - Levanté el frontend con `npm install` y `npm run dev`.
+  - Revisé en GitHub que cada fase tuviera su commit, e hice yo el merge y el push de cada una.
+  - Leí y verifiqué los documentos de las fases 1 a 4 y del memory-bank.
 - Algo que corregí o con lo que no estuve de acuerdo:
+  - Al rehacer este documento, entendí que mi primera idea de `/health` estaba incompleta: el frontend sí recibe datos del backend, pero el proxy solo reenvía las rutas que empiezan por `/api`.
