@@ -10,7 +10,9 @@ export default defineConfig({
     host: "0.0.0.0",
     proxy: {
       "/api": {
-        target: "http://backend:8000",
+        // Local runs hit localhost; docker-compose sets API_PROXY_TARGET to the
+        // backend service name, which only resolves inside the Docker network.
+        target: process.env.API_PROXY_TARGET ?? "http://localhost:8000",
         changeOrigin: true,
       },
     },

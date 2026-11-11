@@ -5,6 +5,7 @@ import {
   computeMonthlyData,
   formatCurrency,
   formatPercent,
+  formatPeriodLabel,
 } from "./financial-utils";
 import type { FinancialMovement } from "./financial-types";
 
@@ -100,6 +101,35 @@ describe("computeMonthlyData", () => {
       outcome: 0,
       profitPercent: 100,
     });
+  });
+});
+
+describe("computeMonthlyData timezone safety", () => {
+  it("keeps first-of-month movements in their own month", () => {
+    const firstOfMonth: FinancialMovement[] = [
+      {
+        create_date: "2025-11-01",
+        amount: 100,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2B",
+      },
+    ];
+
+    const monthlyData = computeMonthlyData(firstOfMonth);
+    expect(monthlyData).toHaveLength(1);
+    expect(monthlyData[0].month).toBe("Nov 2025");
+  });
+});
+
+describe("formatPeriodLabel", () => {
+  it("returns an empty label when there is no data", () => {
+    expect(formatPeriodLabel([])).toBe("");
+  });
+
+  it("spans from the first to the last month", () => {
+    const monthlyData = computeMonthlyData(sampleMovements);
+    expect(formatPeriodLabel(monthlyData)).toBe("Jan 2024 – Feb 2024");
   });
 });
 

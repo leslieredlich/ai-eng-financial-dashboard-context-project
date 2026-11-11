@@ -4,8 +4,11 @@ import {
   type MonthlyDataPoint,
 } from "./financial-types";
 
-function toYearMonthKey(value: Date): string {
-  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}`;
+// Read "YYYY-MM" straight from the ISO string. Parsing with `new Date()` treats
+// the date as UTC midnight, which shifts day-1 movements into the previous
+// month for users west of UTC.
+function toYearMonthKey(isoDate: string): string {
+  return isoDate.slice(0, 7);
 }
 
 function formatMonthYearLabel(yearMonthKey: string): string {
@@ -39,7 +42,7 @@ export function computeMonthlyData(
   const monthlyMap: Record<string, { income: number; outcome: number }> = {};
 
   for (const m of movements) {
-    const yearMonthKey = toYearMonthKey(new Date(m.create_date));
+    const yearMonthKey = toYearMonthKey(m.create_date);
     if (!monthlyMap[yearMonthKey]) {
       monthlyMap[yearMonthKey] = { income: 0, outcome: 0 };
     }
@@ -64,6 +67,15 @@ export function computeMonthlyData(
         profitPercent,
       };
     });
+}
+
+export function formatPeriodLabel(monthlyData: MonthlyDataPoint[]): string {
+  if (monthlyData.length === 0) {
+    return "";
+  }
+  const first = monthlyData[0].month;
+  const last = monthlyData[monthlyData.length - 1].month;
+  return first === last ? first : `${first} – ${last}`;
 }
 
 export function formatCurrency(value: number): string {
