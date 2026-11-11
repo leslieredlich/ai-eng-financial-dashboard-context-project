@@ -27,6 +27,7 @@ README, instrucciones para agentes y mensajes de commit.
 2. **(R19) Las rutas que cita `AGENTS.md` deben existir.** Al añadir una regla, crea el archivo en `.agents/rules/` y añádelo a la tabla de `.agents/rules/README.md`. Si una regla cita un archivo o una línea que cambias, actualiza la cita.
 3. **(R21) Mensajes de commit con Conventional Commits:** `tipo: descripción en imperativo`. Tipos: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`. Si el commit no cabe en un solo tipo, probablemente debería ser varios commits.
 4. Las afirmaciones de la documentación deben poder comprobarse en el repo (archivo, comando o URL local). No documentes funcionalidades ni planes que no existan.
+5. **`memory-bank/` describe el estado real.** Si tu cambio altera algo que describe (endpoints, versiones, comandos, gaps, prioridades), actualiza el archivo afectado y su fecha de *Última verificación* en el mismo commit.
 
 ## Cómo comprobar
 
@@ -39,4 +40,4 @@ git log --format=%s -5
 
 ## Validación
 
-R20 aplicada: se añadió "Cómo ejecutar sin Docker" y "Tests" a los dos README, y sus comandos se ejecutaron tal como están escritos. R19: esta carpeta crea `.agents/rules/`; `memory-bank/` se crea en la Fase 4. R21: el commit de esta fase usa `feat:`. Detalle en `analysis/phase-3-rule-validation.md`.
+R20 aplicada: se añadió "Cómo ejecutar sin Docker" y "Tests" a los dos README, y sus comandos se ejecutaron tal como están escritos. R19: la Fase 3 creó `.agents/rules/` y la Fase 4 `memory-bank/`, así que las rutas que cita `AGENTS.md` existen (salvo `.agents/skills/`, aún sin skills). R21: el commit de esta fase usa `feat:`. Detalle en `analysis/phase-3-rule-validation.md`.

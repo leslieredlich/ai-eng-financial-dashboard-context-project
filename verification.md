@@ -21,7 +21,7 @@ Rastro de la revisión del proyecto hecha con el agente (Claude Code) y contrast
 | Afirmación | Estado | Evidencia / corrección |
 |---|---|---|
 | `main.py` crea la app, CORS y registra el router | ✅ | `backend/app/main.py` |
-| Hay 10 endpoints | ✅ | decoradores `@router.get` en `routes.py` |
+| Hay 10 endpoints | ❌ | Son **9** (`grep -c "@router.get" backend/app/routes.py`). Corregido en la Fase 4 al construir `memory-bank/` |
 | El front solo usa `/api/metrics` | ✅ | único `fetch` en `App.tsx` |
 | `index.html` → `main.tsx` → `App.tsx` | ✅ | `index.html:11` |
 | Componentes dashboard (5) y ui (2) | ✅ | `src/components/` |
@@ -53,5 +53,5 @@ Rastro de la revisión del proyecto hecha con el agente (Claude Code) y contrast
 ## 5. Pendientes conocidos (fuera de alcance)
 
 - `requirements.txt` sin versiones fijadas.
-- Los 9 endpoints restantes del backend no se usan en el frontend.
+- Los 8 endpoints restantes del backend no se usan en el frontend (corregido en la Fase 4; decía 9).
 - El contenedor backend siempre corre en modo desarrollo (`--reload` + debugpy).
