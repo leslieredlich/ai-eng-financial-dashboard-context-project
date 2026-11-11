@@ -1,4 +1,5 @@
-from datetime import date
+import random
+from datetime import date, timedelta
 
 from fastapi.testclient import TestClient
 
@@ -14,6 +15,15 @@ def test_generate_mock_movements_returns_full_year_sorted_data():
 
     assert len(movements) == 360
     assert movements == sorted(movements, key=lambda item: item.create_date)
+
+
+def test_generate_mock_movements_does_not_reseed_global_random():
+    random.seed(1)
+    expected = random.random()
+
+    random.seed(1)
+    generate_mock_movements(seed=42)
+    assert random.random() == expected
 
 
 def test_filter_movements_by_date_includes_range_edges():
@@ -155,9 +165,19 @@ def test_top_categories_returns_limited_sorted_categories():
 
 
 def test_metrics_comparison_returns_delta_fields():
+    # Mock data is generated relative to today, so derive the window from the
+    # facets instead of hardcoding dates (rule: .agents/rules/testing.md).
+    max_date = date.fromisoformat(
+        client.get("/api/metrics/facets").json()["max_date"])
+    end_date = max_date.replace(day=1) - timedelta(days=1)
+    start_date = end_date.replace(day=1)
+
     response = client.get(
         "/api/metrics/comparison",
-        params={"start_date": "2025-03-01", "end_date": "2025-03-31"},
+        params={
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+        },
     )
 
     assert response.status_code == 200
@@ -168,6 +188,11 @@ def test_metrics_comparison_returns_delta_fields():
         "delta_abs",
         "delta_pct",
     }
+    assert payload["current_period"] != 0
+    assert payload["previous_period"] != 0
+    assert payload["delta_abs"] == round(
+        payload["current_period"] - payload["previous_period"], 2
+    )
 
 
 def test_metrics_alerts_returns_anomaly_candidates():

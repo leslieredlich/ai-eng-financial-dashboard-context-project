@@ -49,6 +49,36 @@ If you need to target a different backend origin, copy `frontend/.env.example` t
 - Backend: http://localhost:8000
 - API documentation: http://localhost:8000/docs
 
+## How to run without Docker
+
+Requirements: Python 3.10+ and Node.js 20.19+ (see `frontend/.nvmrc`).
+
+Backend (from `backend/`):
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt          # Windows: .venv\Scripts\pip
+.venv/bin/python -m uvicorn app.main:app --reload --port 8000   # Windows: .venv\Scripts\python
+```
+
+Frontend (from `frontend/`, in another terminal):
+
+```bash
+npm install
+npm run dev
+```
+
+Without Docker, the Vite proxy targets `http://localhost:8000`. On Windows, if PowerShell blocks `npm` or `Activate.ps1`, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
+## Tests
+
+| Where | Command |
+|---|---|
+| `backend/` | `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`) |
+| `frontend/` | `npm test` · `npm run lint` · `npx tsc -b` |
+
+The contract test `backend/tests/test_contract.py` reads `frontend/`, so run `pytest` from the full repo checkout: it is skipped inside the backend container.
+
 ---
 
 This and many other projects are built by students as part of the [Career Programs](https://4geeksacademy.com/compare-programs) at [4Geeks Academy](https://4geeksacademy.com). By [@marcogonzalo](https://github.com/marcogonzalo) and [other contributors](https://github.com/4GeeksAcademy/ai-eng-financial-dashboard-context-project/graphs/contributors). Find out more about [AI Engineering](https://4geeksacademy.com/en/coding-bootcamps/ai-engineering), [Data Science & Machine Learning](https://4geeksacademy.com/en/coding-bootcamps/data-science-ml), [Cybersecurity](https://4geeksacademy.com/en/coding-bootcamps/cybersecurity) and [Full-Stack Software Developer with AI](https://4geeksacademy.com/en/coding-bootcamps/full-stack-developer).

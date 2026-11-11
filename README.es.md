@@ -49,6 +49,36 @@ Si necesitas apuntar a otro backend, copia `frontend/.env.example` como `.env` y
 - Backend: http://localhost:8000
 - Documentación API: http://localhost:8000/docs
 
+## Cómo ejecutar sin Docker
+
+Requisitos: Python 3.10+ y Node.js 20.19+ (ver `frontend/.nvmrc`).
+
+Backend (desde `backend/`):
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt          # Windows: .venv\Scripts\pip
+.venv/bin/python -m uvicorn app.main:app --reload --port 8000   # Windows: .venv\Scripts\python
+```
+
+Frontend (desde `frontend/`, en otra terminal):
+
+```bash
+npm install
+npm run dev
+```
+
+Sin Docker, el proxy de Vite apunta a `http://localhost:8000`. En Windows, si PowerShell bloquea `npm` o `Activate.ps1`, ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+## Tests
+
+| Dónde | Comando |
+|---|---|
+| `backend/` | `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`) |
+| `frontend/` | `npm test` · `npm run lint` · `npx tsc -b` |
+
+El test de contrato `backend/tests/test_contract.py` lee `frontend/`, así que ejecuta `pytest` desde el repo completo: dentro del contenedor backend se omite.
+
 ---
 
 Este y muchos otros proyectos son construidos por estudiantes como parte de los [Coding Bootcamps](https://4geeksacademy.com/) de 4Geeks Academy. Encuentra más acerca de los [cursos](https://4geeksacademy.com/es/comparar-programas) de [Ingeniería de IA](https://4geeksacademy.com/es/coding-bootcamps/ingenieria-ia), [Data Science & Machine Learning](https://4geeksacademy.com/es/coding-bootcamps/curso-datascience-machine-learning), [Ciberseguridad](https://4geeksacademy.com/es/coding-bootcamps/curso-ciberseguridad) y [Full-Stack Software Developer con IA](https://4geeksacademy.com/es/coding-bootcamps/programador-full-stack).

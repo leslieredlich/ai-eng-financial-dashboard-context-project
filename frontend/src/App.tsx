@@ -38,7 +38,7 @@ function App() {
       })
       .catch(() => {
         setError(
-          "No se pudo cargar la informacion financiera. Revisa la API de backend.",
+          "Could not load financial data. Check that the backend API is running.",
         );
       })
       .finally(() => {

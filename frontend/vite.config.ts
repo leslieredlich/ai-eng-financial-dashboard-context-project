@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -16,6 +17,12 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  test: {
+    // A timezone west of UTC makes date bugs (e.g. `new Date("YYYY-MM-01")`
+    // landing in the previous month) reproducible on any machine, including
+    // UTC containers. See .agents/rules/testing.md.
+    env: { TZ: "America/Santiago" },
   },
   resolve: {
     alias: {
