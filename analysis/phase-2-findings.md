@@ -1,5 +1,7 @@
 # Fase 2 — Hallazgos de ingeniería y reglas propuestas
 
+En esta fase pasé de *entender* el proyecto a encontrar qué puede romperlo. Con el agente revisamos el código buscando patrones, y solo me quedé con los hallazgos que tienen evidencia concreta (archivo y línea, o un comando que los demuestra). Aprendí a separar dos cosas: un **hallazgo** es un hecho del repo ("el filtro `business_type` está copiado en 4 endpoints") y una **regla** es la decisión que tomo por ese hecho ("los filtros van en `filter_movements`"). También dejé anotado lo que descarté (§7), porque explicar por qué algo *no* es una regla evita que alguien la proponga de nuevo sin motivo.
+
 Análisis del repo hecho con el agente (Claude Code). Objetivo: dejar a futuros contribuidores (personas o agentes) las convenciones que conviene seguir y los patrones que pueden romper algo sin avisar.
 
 **Método**

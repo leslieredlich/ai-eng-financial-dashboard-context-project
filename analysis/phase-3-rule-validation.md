@@ -1,5 +1,7 @@
 # Fase 3 — Validación de reglas
 
+En esta fase convertí las propuestas de la Fase 2 en reglas dentro de `.agents/rules/` y comprobé que sirven de verdad: una regla que no cambia cómo se trabaja es solo una opinión escrita. Por eso cada archivo de reglas se probó con una tarea real, hecha con el agente. Lo más útil que entendí fue que una regla se vuelve confiable cuando un test la protege: el test de contrato, por ejemplo, falla si alguien cambia un tipo en el backend y olvida cambiarlo en el frontend. Las reglas que no pude validar quedaron marcadas como pendientes, sin fingir que funcionan.
+
 Cada archivo de `.agents/rules/` se validó con al menos una tarea pequeña y real en este repo. Para cada una: qué regla dirigió el cambio, cómo se comprobó y qué se refinó en la regla después de aplicarla.
 
 ## Resumen

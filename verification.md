@@ -1,57 +1,84 @@
 # Verificación — Fase 1: Comprender el handover
 
-Rastro de la revisión del proyecto hecha con el agente (Claude Code) y contrastada contra el código.
+En esta fase recibí un proyecto que yo no había escrito y tuve que entenderlo antes de tocarlo. Trabajé con un agente de IA (Claude Code): le pedí que analizara el repo y me hiciera un resumen. Después contrastamos ese resumen con el código real, porque un resumen de IA sin comprobar es solo una suposición. Este documento es el rastro de esa revisión.
 
-## 1. Mapa del proyecto
+## 1. Cómo entiendo el proyecto
 
-| Pieza | Stack | Puerto | Entry point |
+Es un dashboard financiero de una sola página. Tiene dos partes que corren por separado:
+
+| Pieza | Stack | Puerto | Dónde arranca |
 |---|---|---|---|
 | Frontend | React 19 + TypeScript + Vite 8 + Tailwind 4 + Recharts | 5173 | `index.html` → `src/main.tsx` → `src/App.tsx` |
-| Backend | FastAPI + Uvicorn (lanzado por debugpy en Docker) | 8000 (debug 5678) | `app/main.py` → `router` de `app/routes.py` |
+| Backend | FastAPI + Uvicorn (en Docker lo lanza `debugpy`) | 8000 (depuración en 5678) | `app/main.py` → `router` de `app/routes.py` |
 
-- **Datos:** no hay base de datos. El backend genera 360 movimientos falsos (30 por mes, últimos 12 meses) con `random.seed(42)`.
-- **Endpoints:** `/health`, `/api/metrics`, `/api/metrics/{b2b,b2c,facets,summary,categories/top,comparison,alerts}`.
-- **Conexión:** el front solo llama a `/api/metrics`; el proxy de Vite reenvía `/api` al backend. KPIs y agregados mensuales se calculan en el navegador (`src/lib/financial-utils.ts`).
-- **Ejecución:** `docker compose up --build`, o local con `.venv` + `uvicorn` en `backend/` y `npm install` + `npm run dev` en `frontend/` (Node ≥ 20.19).
+**De dónde salen los datos:** no hay base de datos. Cada vez que alguien pide datos, el backend inventa 360 movimientos (30 por mes durante 12 meses) con una semilla fija (`42`), así que el mismo día siempre salen los mismos datos.
 
-## 2. Verificación del resumen
+**El recorrido de un dato, de principio a fin:**
 
-✅ correcto · ❌ incorrecto · ❓ no verificable / desactualizado · ⚠️ incompleto
+1. Abro `localhost:5173` en el navegador y Vite me entrega la página de React.
+2. `App.tsx` pide los datos a `/api/metrics`.
+3. Esa petición llega a Vite, que no tiene datos propios. Como empieza por `/api`, su **proxy** la reenvía al backend en el puerto 8000.
+4. FastAPI genera los movimientos y los devuelve en JSON.
+5. Vite le pasa la respuesta al navegador y `src/lib/financial-utils.ts` calcula los KPIs y los totales por mes que se ven en pantalla.
 
-| Afirmación | Estado | Evidencia / corrección |
+Por eso `localhost:8000/health` responde `{"status":"ok"}` y `localhost:5173/health` no: el proxy de Vite solo reenvía las rutas que empiezan por `/api`. Cualquier otra ruta la responde Vite con la página de React.
+
+**Endpoints del backend:** `/health`, `/api/metrics` y `/api/metrics/{b2b, b2c, facets, summary, categories/top, comparison, alerts}`. El frontend solo usa `/api/metrics`.
+
+**Cómo se ejecuta:**
+- Con Docker: `docker compose up --build`.
+- Sin Docker: en `backend/`, un entorno virtual `.venv` y `uvicorn`; en `frontend/`, `npm install` y `npm run dev`. Requiere Node ≥ 20.19.
+
+## 2. Qué dijo el resumen y qué era verdad
+
+✅ correcto · ❌ incorrecto · ❓ no verificable o desactualizado · ⚠️ incompleto
+
+| Lo que decía el resumen | Estado | Cómo lo comprobamos / qué era en realidad |
 |---|---|---|
-| `main.py` crea la app, CORS y registra el router | ✅ | `backend/app/main.py` |
-| Hay 10 endpoints | ❌ | Son **9** (`grep -c "@router.get" backend/app/routes.py`). Corregido en la Fase 4 al construir `memory-bank/` |
-| El front solo usa `/api/metrics` | ✅ | único `fetch` en `App.tsx` |
-| `index.html` → `main.tsx` → `App.tsx` | ✅ | `index.html:11` |
-| Componentes dashboard (5) y ui (2) | ✅ | `src/components/` |
-| `lib/` = tipos, cálculos, mock-data | ⚠️ | faltaba `utils.ts` (`cn()`) y `financial-utils.test.ts` |
-| `mock-data.ts` no se usa | ✅ | ningún import → eliminado |
-| Backend arranca con `uvicorn --reload` | ⚠️ | lo lanza `debugpy`, que a su vez lanza uvicorn |
-| "El frontend arranca después del backend" | ⚠️ | `depends_on` no esperaba a que la API respondiera → healthcheck añadido |
-| Links con número de línea del primer resumen | ❌ | eran líneas de un volcado combinado, no del archivo real; corregidos |
-| Título "2024 - Full Year" | ❓ | ya había cambiado; seguía siendo texto fijo → ahora se calcula |
-| El proyecto corre en local sin Docker | ❌ | proxy fijo a `backend:8000` (solo existe en Docker) → configurable |
+| `main.py` crea la app, configura CORS y registra el router | ✅ | Se ve en `backend/app/main.py` |
+| Hay 10 endpoints | ❌ | Son **9** (`grep -c "@router.get" backend/app/routes.py`). Este error se nos pasó en la Fase 1 y lo detectamos en la Fase 4, al construir `memory-bank/` |
+| El front solo usa `/api/metrics` | ✅ | Hay un único `fetch` en `App.tsx` |
+| `index.html` → `main.tsx` → `App.tsx` | ✅ | `index.html:11` carga `main.tsx` |
+| Hay 5 componentes de dashboard y 2 de ui | ✅ | Carpeta `src/components/` |
+| `lib/` tiene tipos, cálculos y mock-data | ⚠️ | Faltaban `utils.ts` (la función `cn()`) y `financial-utils.test.ts` |
+| `mock-data.ts` no se usa | ✅ | Ningún archivo lo importa, así que lo eliminamos |
+| El backend arranca con `uvicorn --reload` | ⚠️ | En Docker lo arranca `debugpy`, que a su vez lanza uvicorn |
+| "El frontend arranca después del backend" | ⚠️ | `depends_on` solo esperaba a que el contenedor arrancara, no a que la API respondiera. Añadimos un healthcheck |
+| Los números de línea del primer resumen | ❌ | Venían de un volcado de varios archivos juntos, no del archivo real. Los corregimos |
+| El título dice "2024 - Full Year" | ❓ | Ya había cambiado, pero seguía siendo texto fijo. Ahora se calcula a partir de los datos |
+| El proyecto corre en local sin Docker | ❌ | El proxy apuntaba siempre a `backend:8000`, un nombre que solo existe dentro de Docker. Lo hicimos configurable |
 
-## 3. Problemas encontrados y corregidos
+Lo que me llevo de esta tabla: la IA acertó en lo general, pero se equivocó en detalles concretos (el número de endpoints, las líneas). Esos detalles son justo los que más confunden a quien llega después.
 
-| Problema | Corrección |
-|---|---|
-| Movimientos del día 1 se contaban en el mes anterior en zonas horarias al oeste de UTC (`new Date("2025-11-01")` = 31-oct en UTC-3) | El mes se lee del texto ISO (`slice(0, 7)`); test añadido |
-| Período del header escrito a mano | `formatPeriodLabel()` lo calcula a partir de los datos; tests añadidos |
-| Frontend arrancaba antes de que la API respondiera | `healthcheck` sobre `/health` + `condition: service_healthy` |
-| Proxy de Vite fijo a `http://backend:8000` | `API_PROXY_TARGET` (Docker lo define; por defecto `localhost:8000`) |
-| `mock-data.ts` sin uso | Eliminado |
+## 3. Problemas que encontramos y cómo los corregimos
+
+| Problema | Por qué pasaba | Corrección |
+|---|---|---|
+| Los movimientos del día 1 se contaban en el mes anterior | `new Date("2025-11-01")` se interpreta como medianoche en UTC. En Chile (UTC-3) eso es el 31 de octubre a las 21:00 | El mes se lee directamente del texto (`"2025-11-01".slice(0, 7)` → `"2025-11"`), sin convertir a fecha. Añadimos un test |
+| El periodo del encabezado estaba escrito a mano | Era texto fijo en el componente | `formatPeriodLabel()` lo calcula a partir de los datos. Añadimos tests |
+| El frontend arrancaba antes de que la API respondiera | `depends_on` no espera a que el servicio esté listo | Healthcheck sobre `/health` y `condition: service_healthy` |
+| El proyecto no corría sin Docker | El proxy de Vite apuntaba fijo a `http://backend:8000` | Variable `API_PROXY_TARGET`: Docker la define y, si no existe, se usa `localhost:8000` |
+| Había código muerto | `mock-data.ts` no lo usaba nadie | Eliminado |
 
 ## 4. Comprobaciones ejecutadas
 
-- Frontend: `tsc -b`, `npm test` (8/8) y `npm run lint` sin errores.
-- Backend: `pytest` (15/15).
-- Docker: backend `healthy` antes de arrancar el frontend; `GET /api/metrics` vía proxy → 200.
-- Bug de zona horaria reproducido con `TZ` en UTC-3: antes `2025-10`, después `2025-11`.
+- Frontend: `tsc -b`, `npm test` (8/8) y `npm run lint`, sin errores.
+- Backend: `pytest` (15/15 en esta fase).
+- Docker: el backend queda `healthy` antes de que arranque el frontend, y `GET /api/metrics` a través del proxy responde 200.
+- Bug de zona horaria: lo reproducimos con `TZ` en UTC-3. Antes el movimiento caía en `2025-10`; después, en `2025-11`.
 
-## 5. Pendientes conocidos (fuera de alcance)
+Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dentro de Docker, porque Docker corre en UTC y ahí el bug no aparece. Un test que no puede fallar no protege nada. Por eso en la Fase 3 fijamos la zona horaria de los tests (regla R16).
 
-- `requirements.txt` sin versiones fijadas.
-- Los 8 endpoints restantes del backend no se usan en el frontend (corregido en la Fase 4; decía 9).
-- El contenedor backend siempre corre en modo desarrollo (`--reload` + debugpy).
+## 5. Pendientes que dejé fuera de esta fase
+
+- `requirements.txt` no fija versiones, así que cada instalación puede traer versiones distintas.
+- 8 de los 9 endpoints del backend no los usa el frontend.
+- El contenedor del backend siempre corre en modo desarrollo (`--reload` + `debugpy`).
+
+## 6. Mi revisión personal
+
+<!-- Completar con lo que hice yo directamente. Solo escribir lo que realmente hice. -->
+
+- Fecha:
+- Qué comprobé por mi cuenta (rutas que abrí, comandos que ejecuté y qué vi):
+- Algo que corregí o con lo que no estuve de acuerdo:
