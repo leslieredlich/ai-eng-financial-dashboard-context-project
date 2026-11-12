@@ -133,3 +133,18 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
 - Las props de los 8 componentes nuevos están escritas en TypeScript y usan los tipos de la Fase 2. `tsc --strict` y `eslint specs` pasan, sin `any` ni `object`.
 - Resolví 7 ambigüedades del brief en una tabla de decisiones. Entre ellas: vista por hash en vez de router, un solo rango de fechas compartido y la etiqueta honesta de `baseline_average`.
 - Comprobé los ejemplos del documento con las funciones de formato del repo (`formatCurrency`, `formatPercent`, `toLocaleDateString`): `$88,077`, `59.2%`, `30.0%`, `90.6%`, `$615,541`, `Mar 2026`. También comprobé que los tokens `--chart-1` y `--chart-4` existen en `:root` y en `.dark`.
+
+# Verificación — Specs del frontend, Fase 4: Contrato de datos
+
+- Fecha: 2026-11-12. Archivos: `frontend/specs/README.md`, `frontend/specs/api-contract.ts` y `frontend/specs/tsconfig.json`.
+- Volví a leer `/openapi.json` en vivo: los 4 endpoints (`/facets`, `/api/metrics`, `/alerts`, `/categories/top`) tienen los parámetros, valores por defecto, mínimos y máximos que dice el README. El script de comparación contra OpenAPI da 0 fallas.
+- Repetí con `curl` cada caso borde del README, 26 llamadas en total. Algunos resultados: `?start_date=` → 422, inicio > fin → `[]`, solo `start_date=2026-10-01` → 30 movimientos, umbral `0.3` → 4 alertas, `0.01` → 5, `1` → 1, `1.5` → `[]`, B2B en octubre de 2026 → 1 categoría, `b2b` → 422, `limit=0` o `21` → 422.
+- Cada funcionalidad tiene entre 6 y 8 casos borde, cada uno con lo que muestra la UI.
+- Agregué `api-contract.ts`, que une cada endpoint con su tipo de request y de response, y tipa el error 422 sin `any`.
+- `npx tsc --noEmit` a secas no revisaba nada: el `tsconfig.json` raíz tiene `"files": []`. Agregué `specs/tsconfig.json`, que hereda las reglas de la app. Con él, `npx tsc --noEmit -p specs` compila los 4 `.ts`. `eslint specs` y `tsc -b` de la app también pasan.
+- Un script comprueba que los 12 tipos copiados en el README son idénticos a los de los `.ts`.
+- Corregí en `components.md` la nota de F3 con 1 sola categoría, que quedaba "1 income categories": ahora va en singular.
+- Revisé el README pensando en una sesión nueva sin contexto e hice 3 ajustes para que no tenga que preguntar:
+  - Agregué una tabla de qué existe y qué se crea, con el archivo y la firma de cada función nueva.
+  - Cambié ❓ por 📐 (decisión de spec ya cerrada) en el manejo de errores.
+  - Dejé explícito que `dateRange` es un solo estado en `App.tsx`, compartido por las dos vistas.

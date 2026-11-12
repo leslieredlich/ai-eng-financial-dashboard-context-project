@@ -189,7 +189,7 @@ Renderizado condicional (cada panel por separado):
 | `loading` | Tres filas de `Skeleton`. |
 | `error !== null` | `error` con `role="alert"`, por ejemplo `"Could not load B2B income categories."`. El otro panel no se ve afectado. |
 | `rows.length === 0` | **Top 5 vacío:** el panel mantiene su título y muestra `EmptyStateMessage` con `"No income for {businessType} in this date range."`, sin tabla ni pie. |
-| `rows.length` entre 1 y 4 | La tabla con esas filas, sin filas de relleno, y la nota `"Only {n} income categories have data for {businessType}."` Hoy es el caso normal: llegan 2 (`sales`, `others`). |
+| `rows.length` entre 1 y 4 | La tabla con esas filas, sin filas de relleno, y una nota: con 1 fila, `"Only 1 income category has data for {businessType}."`; con 2 a 4, `"Only {n} income categories have data for {businessType}."` Hoy es el caso normal: llegan 2 (`sales`, `others`). |
 | `rows.length === 5` | La tabla completa, sin nota. |
 
 ### `BusinessIncomeChart`
