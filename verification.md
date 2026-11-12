@@ -125,3 +125,11 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
 - Omisiones a propósito, documentadas en JSDoc: `business_type` en `AlertsParams` y `category` en `DateRangeFilter` (ninguna funcionalidad los usa).
 - `tsc --strict` (con las mismas opciones de `tsconfig.app.json`) y `eslint specs` pasan sin errores. No hay `any` ni `object`.
 - Cada propiedad tiene JSDoc con significado, valores válidos y formato. Los valores citados (`2025-11-01`, `0.5917`, `55334.29`) salen de llamadas reales.
+
+# Verificación — Specs del frontend, Fase 3: Componentes
+
+- Fecha: 2026-11-12. Archivos: `frontend/specs/components.md` y `frontend/specs/component-props.ts`.
+- Antes de escribir, leí los componentes existentes (`income-outcome-chart.tsx`, `kpi-card.tsx`, `kpi-row.tsx`, `dashboard-header.tsx`) para copiar sus patrones: props con `loading?`, `Card` + `Skeleton` mientras carga y un mensaje centrado si no hay datos.
+- Las props de los 8 componentes nuevos están escritas en TypeScript y usan los tipos de la Fase 2. `tsc --strict` y `eslint specs` pasan, sin `any` ni `object`.
+- Resolví 7 ambigüedades del brief en una tabla de decisiones. Entre ellas: vista por hash en vez de router, un solo rango de fechas compartido y la etiqueta honesta de `baseline_average`.
+- Comprobé los ejemplos del documento con las funciones de formato del repo (`formatCurrency`, `formatPercent`, `toLocaleDateString`): `$88,077`, `59.2%`, `30.0%`, `90.6%`, `$615,541`, `Mar 2026`. También comprobé que los tokens `--chart-1` y `--chart-4` existen en `:root` y en `.dark`.
