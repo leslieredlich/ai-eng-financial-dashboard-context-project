@@ -115,3 +115,13 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
   - En `/docs`, todos los campos de `MetricsFacets`, `MetricsAlert` y `TopCategoryItem` son obligatorios.
   - Las specs deben usar textos de UI en inglés (R13), el vocabulario `outcome` (R12) y fechas como texto, no con `new Date()`.
 - Resolví cada desajuste en la spec, no en el código. Quedan 4 preguntas abiertas para el PM.
+
+# Verificación — Specs del frontend, Fase 2: Tipos TypeScript
+
+- Fecha: 2026-11-12. Archivos: `frontend/specs/api-types.ts` y `frontend/specs/param-types.ts`.
+- Nombres de `/docs` → nombres de la spec: `MetricsFacets` → `FacetsResponse`, `MetricsAlert` → `AlertEntry`, `TopCategoryItem` → `CategoryEntry`.
+- Los enums (`OperationType`, `Category`, `BusinessType`) se importan de `src/lib/financial-types.ts`, que `test_contract.py` mantiene sincronizado con el backend. No se copian por tercera vez.
+- Comparé cada interfaz con `GET /openapi.json` usando un script: mismos campos, mismo tipo y misma obligatoriedad → 0 fallas. Para probar el script, sembré 3 errores en una copia (un tipo cambiado, un campo opcional y un nombre cambiado) y detectó los 3.
+- Omisiones a propósito, documentadas en JSDoc: `business_type` en `AlertsParams` y `category` en `DateRangeFilter` (ninguna funcionalidad los usa).
+- `tsc --strict` (con las mismas opciones de `tsconfig.app.json`) y `eslint specs` pasan sin errores. No hay `any` ni `object`.
+- Cada propiedad tiene JSDoc con significado, valores válidos y formato. Los valores citados (`2025-11-01`, `0.5917`, `55334.29`) salen de llamadas reales.
