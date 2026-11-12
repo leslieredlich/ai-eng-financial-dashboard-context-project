@@ -88,3 +88,24 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
   - Leí y verifiqué los documentos de las fases 1 a 4 y del memory-bank.
 - Algo que corregí o con lo que no estuve de acuerdo:
   - Al rehacer este documento, entendí que mi primera idea de `/health` estaba incompleta: el frontend sí recibe datos del backend, pero el proxy solo reenvía las rutas que empiezan por `/api`.
+---
+
+# Verificación — Specs del frontend, Fase 1: Explorar la API
+
+- Fecha: 2026-11-12 · Rama: `feature/frontend-specs` (sale de `main` en `16c53b7`).
+- Arranqué el backend sin Docker (`.venv` + `uvicorn --reload`). `GET /health` respondió `{"status":"ok"}` y abrí `/docs`.
+- Leí `openapi.json` y `backend/app/routes.py`: hay 8 endpoints de métricas y la UI solo usa `/api/metrics` (`App.tsx:20`).
+- Llamé a cada endpoint con `curl` y confirmé las formas de respuesta y los casos borde:
+  - `/comparison` sin fechas → `422`. Con un rango sin datos (2024-01) → `delta_pct: null`.
+  - `/alerts?threshold=30` → `[]`, porque el umbral es una proporción (`0.3` = 30 %).
+  - `/categories/top` → 4 categorías de gasto aunque `limit` sea 5. `limit=50` → `422`.
+  - `business_type=b2b` → `422`; solo acepta `B2B` o `B2C`.
+  - `/summary?group_by=week` del 2026-10-01 al 2026-10-14 → semanas ISO `W40`–`W42`, incompletas en los bordes.
+- Contrasté las tres funcionalidades del PM con la API en vivo (✅ verificada / ❌ incorrecta / ❓ sin respuesta en la API):
+  - F1 ❌ "extender el endpoint de métricas": `/api/metrics` ya acepta `start_date` y `end_date`. Ojo: `start_date=` vacío → `422`, así que un input vacío no se envía.
+  - F2 ❌ "media móvil de 3 períodos": `baseline_average` es el promedio de todos los periodos anteriores (2026-03: 55334.29; la media de 3 sería 59977.58).
+  - F2 ❌ "umbral entre 0.01 y 1.0": la API acepta cualquier valor ≥ 0 sin máximo (`1.5` → `[]`, `-0.1` → `422`). Lo valida la UI.
+  - F3 ❌ "top 5 de ingresos": solo existen 2 categorías de ingreso (`sales`, `others`).
+  - F3 ❌ "categorías por grupo desde facetas": `/facets?business_type=B2B` devuelve lo mismo que sin filtro.
+  - F3 ❓ "nueva página": el frontend no tiene router.
+- Resolví cada desajuste en la spec, no en el código. Quedan 3 preguntas abiertas para el PM.
