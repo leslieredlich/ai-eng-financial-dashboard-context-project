@@ -148,3 +148,7 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
   - Agregué una tabla de qué existe y qué se crea, con el archivo y la firma de cada función nueva.
   - Cambié ❓ por 📐 (decisión de spec ya cerrada) en el manejo de errores.
   - Dejé explícito que `dateRange` es un solo estado en `App.tsx`, compartido por las dos vistas.
+- Revisé la rúbrica "Qué vamos a evaluar" punto por punto e hice 2 ajustes finales:
+  - `DateRangeFilter` usa `string` directamente, como pide la rúbrica, con la JSDoc `YYYY-MM-DD`. Antes usaba el alias `IsoDateString`, que es el mismo tipo.
+  - El README indica que `npx tsc --noEmit` también funciona tal cual desde `frontend/specs/`.
+  - Después de los cambios, `tsc`, `eslint`, el comparador contra OpenAPI (0 fallas) y la copia de tipos del README pasan.

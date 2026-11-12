@@ -11,7 +11,6 @@
  * - Un valor inválido devuelve HTTP 422 con `detail[]`.
  */
 import type { BusinessType, OperationType } from "../src/lib/financial-types";
-import type { IsoDateString } from "./api-types";
 
 /**
  * Agrupación temporal que aceptan `/api/metrics/alerts` y `/api/metrics/summary`.
@@ -34,7 +33,7 @@ export interface DateRangeFilter {
    * Formato inválido (`"01-10-2026"`) o texto vacío → HTTP 422.
    * Rango útil: de `FacetsResponse.min_date` a `FacetsResponse.max_date`.
    */
-  start_date?: IsoDateString;
+  start_date?: string;
 
   /**
    * Último día incluido, en formato `YYYY-MM-DD` (por ejemplo, `"2026-10-31"`).
@@ -43,7 +42,7 @@ export interface DateRangeFilter {
    * La API no valida que sea posterior a `start_date`: si es anterior, devuelve
    * `[]` con HTTP 200. Esa validación la hace la UI antes de llamar.
    */
-  end_date?: IsoDateString;
+  end_date?: string;
 }
 
 /**

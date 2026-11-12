@@ -62,11 +62,12 @@ Funciones puras que hay que crear. Las usan las secciones F1, F2 y F3 de este RE
 # 1. Backend (desde backend/)
 .venv/Scripts/python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 # 2. Abrir http://127.0.0.1:8000/docs (fuente: /openapi.json)
-# 3. Tipos de las specs (desde frontend/)
-npx tsc --noEmit -p specs
+# 3. Tipos de las specs: cualquiera de estas dos formas
+cd frontend && npx tsc --noEmit -p specs
+cd frontend/specs && npx tsc --noEmit
 ```
 
-`npx tsc --noEmit` sin `-p specs` no revisa estos archivos: el `tsconfig.json` raíz tiene `"files": []`, y la app solo incluye `src/`.
+Las dos usan `specs/tsconfig.json` y revisan los 4 `.ts` de esta carpeta con las reglas estrictas de la app. En cambio, `npx tsc --noEmit` ejecutado en `frontend/` no revisa estos archivos: el `tsconfig.json` raíz tiene `"files": []`, y la app solo incluye `src/`.
 
 Leyenda de este documento:
 
@@ -135,8 +136,8 @@ type BusinessType = "B2B" | "B2C";
 export type IsoDateString = string;
 
 export interface DateRangeFilter {
-  start_date?: IsoDateString;
-  end_date?: IsoDateString;
+  start_date?: string;
+  end_date?: string;
 }
 ```
 
@@ -152,8 +153,8 @@ export interface DateRangeFilter {
 
 | Parámetro | Tipo TS | Obligatorio | Valores válidos | Qué envía F1 |
 | --- | --- | --- | --- | --- |
-| `start_date` | `IsoDateString` | No | Fecha `YYYY-MM-DD`, incluida. Rango útil: `min_date` a `max_date` de `/facets`. | El valor del input "Start date". Se omite si está vacío. |
-| `end_date` | `IsoDateString` | No | Fecha `YYYY-MM-DD`, incluida. Debe ser ≥ `start_date`, pero la API no lo valida. | El valor del input "End date". Se omite si está vacío. |
+| `start_date` | `string` | No | Fecha `YYYY-MM-DD`, incluida. Rango útil: `min_date` a `max_date` de `/facets`. | El valor del input "Start date". Se omite si está vacío. |
+| `end_date` | `string` | No | Fecha `YYYY-MM-DD`, incluida. Debe ser ≥ `start_date`, pero la API no lo valida. | El valor del input "End date". Se omite si está vacío. |
 
 `/api/metrics` también acepta `category` y `operation_type`. F1 no los usa, así que no están en el tipo.
 
@@ -213,7 +214,7 @@ export interface AlertsParams extends DateRangeFilter {
 | --- | --- | --- | --- | --- |
 | `threshold` | `number` | Opcional. Número ≥ 0, sin máximo, por defecto `0.3`. Es una **proporción**: `0.3` = 30 %. | De `0.01` a `1`, ambos incluidos, en pasos de `0.01`. Valor inicial `0.3`. | Siempre el último umbral válido. |
 | `group_by` | `GroupBy` | Opcional. `day`, `week` o `month`; por defecto `month`. | Fijo, no se muestra. | Siempre `"month"`, para que `period` sea `YYYY-MM`. |
-| `start_date`, `end_date` | `IsoDateString` | Iguales que en F1. | Los de F1. | El mismo rango válido de F1, omitiendo las fechas vacías. |
+| `start_date`, `end_date` | `string` | Iguales que en F1. | Los de F1. | El mismo rango válido de F1, omitiendo las fechas vacías. |
 
 La API también acepta `business_type`. F2 no lo usa, así que no está en el tipo.
 
@@ -273,7 +274,7 @@ export interface TopCategoriesParams extends DateRangeFilter {
 | `operation_type` | `OperationType` | Opcional. `income` o `outcome`; por defecto **`outcome`**. | Siempre `"income"`. |
 | `limit` | `number` | Opcional. Entero de 1 a 20; por defecto `5`. `0` o `21` → 422. Es un máximo. | Siempre `5`. |
 | `business_type` | `BusinessType` | Opcional. `B2B` o `B2C`, en mayúsculas. Sin él, la API **suma** las dos líneas. | Siempre: `"B2B"` en una llamada y `"B2C"` en la otra. |
-| `start_date`, `end_date` | `IsoDateString` | Iguales que en F1. | El mismo rango válido de F1 (decisión 4 de `components.md`). |
+| `start_date`, `end_date` | `string` | Iguales que en F1. | El mismo rango válido de F1 (decisión 4 de `components.md`). |
 
 Ejemplo de las dos llamadas sin fechas:
 
