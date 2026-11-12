@@ -101,11 +101,17 @@ Algo que entendí más tarde: el primer test de zona horaria pasaba siempre dent
   - `/categories/top` → 4 categorías de gasto aunque `limit` sea 5. `limit=50` → `422`.
   - `business_type=b2b` → `422`; solo acepta `B2B` o `B2C`.
   - `/summary?group_by=week` del 2026-10-01 al 2026-10-14 → semanas ISO `W40`–`W42`, incompletas en los bordes.
-- Contrasté las tres funcionalidades del PM con la API en vivo (✅ verificada / ❌ incorrecta / ❓ sin respuesta en la API):
+- Contrasté las tres funcionalidades del PM con la API en vivo (✅ verificada en `/docs` / ❌ incorrecta / ❓ sin verificar):
   - F1 ❌ "extender el endpoint de métricas": `/api/metrics` ya acepta `start_date` y `end_date`. Ojo: `start_date=` vacío → `422`, así que un input vacío no se envía.
   - F2 ❌ "media móvil de 3 períodos": `baseline_average` es el promedio de todos los periodos anteriores (2026-03: 55334.29; la media de 3 sería 59977.58).
   - F2 ❌ "umbral entre 0.01 y 1.0": la API acepta cualquier valor ≥ 0 sin máximo (`1.5` → `[]`, `-0.1` → `422`). Lo valida la UI.
   - F3 ❌ "top 5 de ingresos": solo existen 2 categorías de ingreso (`sales`, `others`).
   - F3 ❌ "categorías por grupo desde facetas": `/facets?business_type=B2B` devuelve lo mismo que sin filtro.
+  - F3 ❌ endpoint del PM sin `business_type`: devuelve B2B y B2C sumados (`sales` 1132097.38). Hay que hacer una llamada por línea.
   - F3 ❓ "nueva página": el frontend no tiene router.
-- Resolví cada desajuste en la spec, no en el código. Quedan 3 preguntas abiertas para el PM.
+- Segunda pasada con las reglas del frontend y más casos borde:
+  - Los límites de fecha son inclusivos (`start_date=end_date=2026-10-02` → 1 movimiento) y funcionan por separado.
+  - Bordes del umbral del PM: `0.01` → 5 alertas, `1.0` → 1 alerta; `abc` → `422`.
+  - En `/docs`, todos los campos de `MetricsFacets`, `MetricsAlert` y `TopCategoryItem` son obligatorios.
+  - Las specs deben usar textos de UI en inglés (R13), el vocabulario `outcome` (R12) y fechas como texto, no con `new Date()`.
+- Resolví cada desajuste en la spec, no en el código. Quedan 4 preguntas abiertas para el PM.
