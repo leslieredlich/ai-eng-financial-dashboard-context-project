@@ -21,6 +21,7 @@
 |---|---|---|
 | **`accessibility`** | `addyosmani/web-quality-skills@accessibility` | Título y metadescripción en `index.html`; SkipLink en `App.tsx`; `role="alert"` en error; `aria-label` en regiones; `aria-hidden` en iconos decorativos; `aria-live="polite"` en KPIs dinámicos; `role="img"` con `aria-label` descriptivo en gráficos; `role="status"` en estados vacíos; `aria-labelledby` en charts; `.visually-hidden` class en CSS; media queries `prefers-reduced-motion` y `prefers-contrast: high` |
 | **`vercel-react-best-practices`** | `vercel-labs/agent-skills@vercel-react-best-practices` | `preconnect` y `dns-prefetch` para backend API en `index.html`; verificación de reglas: sin componentes inline, sin barrel imports, sin `&&` en condicionales numéricos |
+| **`performance`** | `addyosmani/web-quality-skills@performance` | Code-splitting con React.lazy+Suspense (597 kB → 243 kB inicial); vendor/charts code splitting en vite.config.ts; React.memo en IncomeOutcomeChart y ProfitPercentChart; hero.png eliminado |
 | **`financial-dashboard-workflow`** | Skill interna del proyecto | `.agents/skills/financial-dashboard-workflow/SKILL.md` — workflow estandarizado de setup, build, test, commits, PR checklist, y notas de arquitectura |
 
 ## Skills instaladas disponibles
@@ -29,6 +30,7 @@
 |---|---|
 | `accessibility` | `.agents/skills/accessibility/SKILL.md` |
 | `vercel-react-best-practices` | `.agents/skills/vercel-react-best-practices/SKILL.md` |
+| `performance` | `.agents/skills/performance/SKILL.md` |
 | `financial-dashboard-workflow` | `.agents/skills/financial-dashboard-workflow/SKILL.md` |
 
 ## Cambios en accesibilidad (detalle)
