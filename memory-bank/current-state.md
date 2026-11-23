@@ -35,25 +35,35 @@
 | TypeScript | `npx skills find typescript` | `wshobson/agents@typescript-advanced-types` |
 | SEO | `npx skills find seo` | `addyosmani/web-quality-skills@seo`, `firecrawl/firecrawl-workflows@firecrawl-seo-audit` |
 
-### Justificación — skill `performance` seleccionada
+### Justificación personal — por qué elegí la skill de rendimiento
 
-De las skills evaluadas, se seleccionó **`addyosmani/web-quality-skills@performance`** por las siguientes razones:
+Cuando mi tech lead me pidió que explorara el ecosistema de skills, ejecuté `npx skills find` con varios temas para ver qué había disponible. Estas fueron las skills que encontré y por qué tomé cada decisión:
 
-1. **Ecosistema unificado**: Pertenece al mismo repositorio (`addyosmani/web-quality-skills`) que la skill `accessibility` ya aplicada. Ambas skills comparten estructura de reglas, formato de auditoría y criterios de verificación — lo que reduce fricción al aplicarlas secuencialmente y hace que los resultados sean consistentes.
+#### 🥇 **Elegí `addyosmani/web-quality-skills@performance`**
 
-2. **Stack-agnostic pero aplicable**: La skill audita Core Web Vitals (LCP, CLS, INP), bundle size analysis, optimización de recursos y patrones de renderizado. Todo esto es relevante para cualquier SPA de React, incluyendo este dashboard con Vite + Recharts.
+Lo primero que noté fue que esta skill viene del **mismo repositorio** que la skill de accesibilidad que ya habíamos aplicado (`addyosmani/web-quality-skills`). Eso me gustó porque:
 
-3. **Complementariedad**: Mientras `vercel-react-best-practices` cubrió patrones de código (useSWR, memo, barrel imports), `performance` cubre la métrica real de rendimiento en producción — tamaño de bundle, carga diferida de módulos pesados y separación de vendor chunks.
+- **Ya conocía la estructura**: las reglas, el formato de auditoría y los criterios de verificación son los mismos. No tuve que aprender un formato nuevo.
+- **Se complementan bien**: accesibilidad mejoró la experiencia para usuarios con tecnologías asistivas; rendimiento mejora la experiencia para **todos** los usuarios, especialmente en conexiones lentas.
 
-4. **Métrica objetiva**: La skill establece un budget de 300 kB para JS inicial. Nuestro bundle inicial medía 597 kB. Después de aplicar la skill, bajó a ~243 kB — evidencia clara de mejora medible.
+Además, cuando revisé qué verificaba esta skill, vi que cubría cosas que **directamente afectaban a nuestro dashboard**:
 
-### Skills consideradas pero no seleccionadas
+- ✅ **Core Web Vitals** (LCP, CLS, INP) — métricas que Google mide en producción
+- ✅ **Tamaño del bundle** — nuestro JS inicial pesaba 597 kB 😱
+- ✅ **Carga diferida** (lazy loading) — perfecto para los componentes de Recharts que son pesados (~350 kB)
+- ✅ **Optimización de recursos** — imágenes no usadas, chunks grandes
 
-| Skill | Motivo para no seleccionar |
+Y lo mejor: la skill me dio un **objetivo claro** — mantener el JS inicial bajo 300 kB. Antes de aplicarla estábamos en 597 kB. Después de aplicar sus recomendaciones (código dividido en partes, lazy loading con React.lazy, separar librerías en chunks), el bundle inicial bajó a **~243 kB**. Esa es una mejora que puedo medir y mostrar.
+
+#### ❌ **Skills que no elegí y por qué**
+
+| Skill que encontré | Por qué no la usé ahora |
 |---|---|
-| `antfu/skills@vitest` | El proyecto ya tiene 8 tests con Vitest. La skill sería útil para expandir la cobertura, pero el foco del ejercicio es mejorar el codebase existente antes de añadir tests nuevos. Queda como recomendación para el roadmap. |
-| `addyosmani/web-quality-skills@seo` | Este dashboard es una herramienta interna de finanzas, no un sitio público. SEO no es una prioridad actual. |
-| `wshobson/agents@typescript-advanced-types` | El proyecto ya corre con TypeScript strict. La skill añadiría patrones avanzados, pero no hay un problema concreto de tipos que resolver ahora. |
+| `antfu/skills@vitest` — testing | El proyecto ya tiene 8 tests con Vitest y funcionan bien. Mejorar los tests es importante pero para otro momento. El foco de este ejercicio era mejorar lo que ya existe, no escribir más tests. |
+| `addyosmani/web-quality-skills@seo` — SEO para motores de búsqueda | Este dashboard lo usa el equipo de finanzas internamente, no es un sitio web público. Google no va a indexar esto. No vale la pena invertir tiempo en SEO ahora. |
+| `wshobson/agents@typescript-advanced-types` — tipos avanzados de TypeScript | Ya tenemos TypeScript en modo estricto. La skill enseña patrones avanzados, pero no tenemos ningún error de tipos ni bug causado por tipos. Arreglar algo que no está roto. |
+
+**En resumen**: elegí `performance` porque atacaba un problema real y medible (bundle de 597 kB → 243 kB), venía del mismo ecosistema que ya conocía (addyosmani/web-quality-skills), y se complementaba con las skills anteriores sin pisarlas. Las otras skills las dejé anotadas como recomendación para el futuro.
 
 ## Skills instaladas disponibles
 
