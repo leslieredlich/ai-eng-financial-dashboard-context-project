@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useMemo } from "react";
+import useSWR from "swr";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
-import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
-import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
   type FinancialMovement,
-  type KPIMetrics,
   type MonthlyDataPoint,
 } from "@/lib/financial-types";
 import {
@@ -14,64 +12,85 @@ import {
   formatPeriodLabel,
 } from "@/lib/financial-utils";
 
+const IncomeOutcomeChart = lazy(() => import("@/components/dashboard/income-outcome-chart"));
+const ProfitPercentChart = lazy(() => import("@/components/dashboard/profit-percent-chart"));
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-async function fetchFinancialData(): Promise<FinancialMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/api/metrics`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch financial data: ${response.status}`);
-  }
-  return response.json();
+const fetcher = (url: string): Promise<FinancialMovement[]> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error(`Failed to fetch financial data: ${res.status}`);
+    return res.json();
+  });
+
+function SkipLink() {
+  return (
+    <a
+      href="#main-content"
+      className="visually-hidden focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:items-center focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
+  );
 }
 
 function App() {
-  const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
-  const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: movements,
+    error,
+    isLoading,
+  } = useSWR(`${API_BASE_URL}/api/metrics`, fetcher, {
+    errorRetryCount: 2,
+  });
 
-  useEffect(() => {
-    fetchFinancialData()
-      .then((movements) => {
-        setMetrics(computeKPIs(movements));
-        setMonthlyData(computeMonthlyData(movements));
-      })
-      .catch(() => {
-        setError(
-          "Could not load financial data. Check that the backend API is running.",
-        );
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const metrics = useMemo(
+    () => (movements ? computeKPIs(movements) : null),
+    [movements],
+  );
+
+  const monthlyData: MonthlyDataPoint[] = useMemo(
+    () => (movements ? computeMonthlyData(movements) : []),
+    [movements],
+  );
 
   return (
-    <main className="dark min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8">
-          <DashboardHeader period={formatPeriodLabel(monthlyData)} />
+    <>
+      <SkipLink />
+      <main
+        id="main-content"
+        className="dark min-h-screen bg-background text-foreground"
+        tabIndex={-1}
+      >
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-8" role="region" aria-label="Dashboard content">
+            <DashboardHeader period={formatPeriodLabel(monthlyData)} />
 
-          {error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
-              {error}
-            </div>
-          ) : null}
+            {error ? (
+              <div
+                role="alert"
+                className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+              >
+                Could not load financial data. Check that the backend API is running.
+              </div>
+            ) : null}
 
-          <section aria-label="Key performance indicators">
-            <KPIRow metrics={metrics} loading={loading} />
-          </section>
+            <section aria-label="Key performance indicators">
+              <KPIRow metrics={metrics} loading={isLoading} />
+            </section>
 
-          <section
-            aria-label="Financial charts"
-            className="grid grid-cols-1 gap-4 xl:grid-cols-2"
-          >
-            <IncomeOutcomeChart data={monthlyData} loading={loading} />
-            <ProfitPercentChart data={monthlyData} loading={loading} />
-          </section>
+            <Suspense fallback={<div className="sr-only">Loading charts…</div>}>
+              <section
+                aria-label="Financial charts"
+                className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+              >
+                <IncomeOutcomeChart data={monthlyData} loading={isLoading} />
+                <ProfitPercentChart data={monthlyData} loading={isLoading} />
+              </section>
+            </Suspense>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 
