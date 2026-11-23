@@ -24,6 +24,17 @@ async function fetchFinancialData(): Promise<FinancialMovement[]> {
   return response.json();
 }
 
+function SkipLink() {
+  return (
+    <a
+      href="#main-content"
+      className="visually-hidden focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:items-center focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
+  );
+}
+
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
@@ -47,31 +58,41 @@ function App() {
   }, []);
 
   return (
-    <main className="dark min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8">
-          <DashboardHeader period={formatPeriodLabel(monthlyData)} />
+    <>
+      <SkipLink />
+      <main
+        id="main-content"
+        className="dark min-h-screen bg-background text-foreground"
+        tabIndex={-1}
+      >
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-8" role="region" aria-label="Dashboard content">
+            <DashboardHeader period={formatPeriodLabel(monthlyData)} />
 
-          {error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
-              {error}
-            </div>
-          ) : null}
+            {error ? (
+              <div
+                role="alert"
+                className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+              >
+                {error}
+              </div>
+            ) : null}
 
-          <section aria-label="Key performance indicators">
-            <KPIRow metrics={metrics} loading={loading} />
-          </section>
+            <section aria-label="Key performance indicators">
+              <KPIRow metrics={metrics} loading={loading} />
+            </section>
 
-          <section
-            aria-label="Financial charts"
-            className="grid grid-cols-1 gap-4 xl:grid-cols-2"
-          >
-            <IncomeOutcomeChart data={monthlyData} loading={loading} />
-            <ProfitPercentChart data={monthlyData} loading={loading} />
-          </section>
+            <section
+              aria-label="Financial charts"
+              className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+            >
+              <IncomeOutcomeChart data={monthlyData} loading={loading} />
+              <ProfitPercentChart data={monthlyData} loading={loading} />
+            </section>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 
