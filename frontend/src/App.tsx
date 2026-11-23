@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import useSWR from "swr";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
   type FinancialMovement,
-  type KPIMetrics,
   type MonthlyDataPoint,
 } from "@/lib/financial-types";
 import {
@@ -16,13 +16,11 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-async function fetchFinancialData(): Promise<FinancialMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/api/metrics`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch financial data: ${response.status}`);
-  }
-  return response.json();
-}
+const fetcher = (url: string): Promise<FinancialMovement[]> =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error(`Failed to fetch financial data: ${res.status}`);
+    return res.json();
+  });
 
 function SkipLink() {
   return (
@@ -36,26 +34,23 @@ function SkipLink() {
 }
 
 function App() {
-  const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
-  const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: movements,
+    error,
+    isLoading,
+  } = useSWR(`${API_BASE_URL}/api/metrics`, fetcher, {
+    errorRetryCount: 2,
+  });
 
-  useEffect(() => {
-    fetchFinancialData()
-      .then((movements) => {
-        setMetrics(computeKPIs(movements));
-        setMonthlyData(computeMonthlyData(movements));
-      })
-      .catch(() => {
-        setError(
-          "Could not load financial data. Check that the backend API is running.",
-        );
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const metrics = useMemo(
+    () => (movements ? computeKPIs(movements) : null),
+    [movements],
+  );
+
+  const monthlyData: MonthlyDataPoint[] = useMemo(
+    () => (movements ? computeMonthlyData(movements) : []),
+    [movements],
+  );
 
   return (
     <>
@@ -74,20 +69,20 @@ function App() {
                 role="alert"
                 className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
               >
-                {error}
+                Could not load financial data. Check that the backend API is running.
               </div>
             ) : null}
 
             <section aria-label="Key performance indicators">
-              <KPIRow metrics={metrics} loading={loading} />
+              <KPIRow metrics={metrics} loading={isLoading} />
             </section>
 
             <section
               aria-label="Financial charts"
               className="grid grid-cols-1 gap-4 xl:grid-cols-2"
             >
-              <IncomeOutcomeChart data={monthlyData} loading={loading} />
-              <ProfitPercentChart data={monthlyData} loading={loading} />
+              <IncomeOutcomeChart data={monthlyData} loading={isLoading} />
+              <ProfitPercentChart data={monthlyData} loading={isLoading} />
             </section>
           </div>
         </div>

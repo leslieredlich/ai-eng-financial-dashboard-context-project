@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -31,22 +32,24 @@ const variantStyles: Record<KPICardProps['variant'], { badge: string; icon: stri
   },
 }
 
-export function KPICard({ label, value, helperText, icon: Icon, variant, loading }: KPICardProps) {
+const KPICardSkeleton = (
+  <Card className="border-border/60">
+    <CardContent className="p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-8 w-8 rounded-lg" />
+      </div>
+      <Skeleton className="h-8 w-36" />
+      <Skeleton className="h-3 w-44" />
+    </CardContent>
+  </Card>
+)
+
+export const KPICard = memo(function KPICard({ label, value, helperText, icon: Icon, variant, loading }: KPICardProps) {
   const styles = variantStyles[variant]
 
   if (loading) {
-    return (
-      <Card className="border-border/60">
-        <CardContent className="p-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-8 w-8 rounded-lg" />
-          </div>
-          <Skeleton className="h-8 w-36" />
-          <Skeleton className="h-3 w-44" />
-        </CardContent>
-      </Card>
-    )
+    return KPICardSkeleton
   }
 
   return (
@@ -67,4 +70,4 @@ export function KPICard({ label, value, helperText, icon: Icon, variant, loading
       </CardContent>
     </Card>
   )
-}
+})

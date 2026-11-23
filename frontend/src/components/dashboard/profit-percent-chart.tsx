@@ -47,19 +47,27 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
+const ProfitPercentSkeleton = (
+  <Card className="border-border/60">
+    <CardHeader className="pb-4">
+      <Skeleton className="h-5 w-52" />
+      <Skeleton className="h-3 w-64 mt-1" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-[280px] w-full rounded-lg" />
+    </CardContent>
+  </Card>
+)
+
+const ProfitPercentNoData = (
+  <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm" role="status">
+    No data available to display
+  </div>
+)
+
 export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   if (loading) {
-    return (
-      <Card className="border-border/60">
-        <CardHeader className="pb-4">
-          <Skeleton className="h-5 w-52" />
-          <Skeleton className="h-3 w-64 mt-1" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-[280px] w-full rounded-lg" />
-        </CardContent>
-      </Card>
-    )
+    return ProfitPercentSkeleton
   }
 
   const hasData = data.some((d) => d.profitPercent !== 0)
@@ -71,11 +79,7 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
         <CardDescription>Monthly profit as a percentage of total income</CardDescription>
       </CardHeader>
       <CardContent>
-        {!hasData ? (
-          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm" role="status">
-            No data available to display
-          </div>
-        ) : (
+        {!hasData ? ProfitPercentNoData : (
           <div role="img" aria-label={`Profit margin chart — ${data.length} months. Margins range from ${Math.min(...data.map(d => d.profitPercent)).toFixed(1)}% to ${Math.max(...data.map(d => d.profitPercent)).toFixed(1)}%.`}>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart
