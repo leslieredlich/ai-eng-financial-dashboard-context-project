@@ -1,140 +1,158 @@
-# Skill: financial-dashboard-workflow
+---
+name: financial-dashboard-workflow
+description: Standardize development, testing, and contribution workflows for the Company Financial Dashboard (React+Vite+FastAPI+Docker). Use for "setup project", "run tests", "commit changes", "open PR", or "verify build".
+license: MIT
+metadata:
+  author: financial-dashboard-team
+  version: "2.0"
+---
 
-> Internal project skill for the Company Financial Dashboard.
-> Created for the 4Geeks Academy AI Engineering program.
+# financial-dashboard-workflow
 
-## Description
+> Skill interna del proyecto — workflow estandarizado de desarrollo, build, test, commits y PRs.
+> Creada para el programa AI Engineering de 4Geeks Academy.
 
-This skill standardizes development, testing, deployment, and contribution workflows for the Company Financial Dashboard (React + Vite + FastAPI + Docker). It ensures every team member follows the same patterns, producing consistent commits, reliable PRs, and verifiable deployments.
+## Cuándo usarla
 
-## When to use
+- Al configurar el proyecto por primera vez
+- Al crear una rama nueva o empezar una feature
+- Antes de hacer commit
+- Antes de abrir un Pull Request
+- Al correr la app localmente o en Docker
+- Al desplegar o verificar el build
 
-Apply this skill when:
-- Setting up the project for the first time
-- Creating a new branch or feature
-- Before pushing a commit
-- Before opening a pull request
-- Running the application locally or in Docker
-- Deploying or verifying a build
+## Objetivo
 
-## Agent Instructions
+Que todo el equipo siga los mismos pasos: setup → build → test → commit → PR. Sin adivinar comandos, sin commits inconsistentes, sin PRs que rompen algo.
 
-### 1. Project Setup & Execution
+## Inputs esperados
 
-- **Local frontend:** `cd frontend && npm install && npm run dev`
-- **Local backend:** `cd backend && python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt && uvicorn main:app --reload --port 8000`
-- **Docker (full stack):** `docker compose up --build` (runs frontend on port 5173, backend on port 8000)
-- **Environment variables:** Frontend uses `VITE_API_BASE_URL` (default `""` — same origin in Docker, or `http://localhost:8000` for standalone dev)
+- Un clon del repo `ai-eng-financial-dashboard-context-project`
+- Node.js 20+ y npm instalados
+- Python 3.13+ instalado (para el backend)
+- Docker Desktop instalado (opcional, para el stack completo)
 
-### 2. Build Verification
+## Output esperado
 
-Always verify the build compiles before committing:
+- Commits con mensajes consistentes (Conventional Commits + Skill tag)
+- Build verificado antes de cada commit
+- PRs que pasan el checklist completo
+
+## Instrucciones para el agent
+
+### 1. Setup y ejecución
+
+```bash
+# Frontend local
+cd frontend && npm install && npm run dev
+
+# Backend local (Windows)
+cd backend && python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt && uvicorn main:app --reload --port 8000
+
+# Stack completo en Docker
+docker compose up --build
+# → frontend en :5173, backend en :8000
+
+# Variables de entorno
+# VITE_API_BASE_URL: "" (mismo origen en Docker), "http://localhost:8000" (standalone)
+```
+
+### 2. Build — siempre verificar antes de commit
 
 ```bash
 cd frontend && npm run build
+# → Ejecuta tsc -b (type check) + vite build
+# → Exit code 0 = OK
+# → Warnings de chunk > 500 kB son aceptables pero anotarlos
 ```
 
-This runs `tsc -b` (TypeScript type-check) followed by `vite build`. Exit code must be 0. Warnings about chunk size > 500 KB are acceptable but should be noted.
-
-### 3. Testing
+### 3. Tests
 
 ```bash
-# Frontend tests (Vitest)
+# Frontend (Vitest)
 cd frontend && npm test
 
-# Backend tests (pytest)
+# Backend (pytest)
 cd backend && pytest
 ```
 
-### 4. Commit Conventions
-
-Use conventional commits. Include a tag referencing the skill or category of change:
+### 4. Commits — formato obligatorio
 
 ```
-<type>(<scope>): <description>
+<tipo>(<scope>): <descripción en imperativo>
 
-[optional body]
+[opcional: cuerpo explicando el cambio]
 
-Skill: <skill-name>
+Skill: <nombre-de-la-skill>
 ```
 
-**Types:** `feat`, `fix`, `perf`, `a11y`, `refactor`, `docs`, `chore`, `test`, `style`
+**Tipos:** `feat`, `fix`, `perf`, `a11y`, `refactor`, `docs`, `chore`, `test`, `style`
 
-**Examples:**
+**Ejemplos:**
 ```
 a11y(header): add aria-label and keyboard skip link
 
 Skill: accessibility
-```
 
-```
+---
+
 perf(charts): hoist static JSX elements and add preconnect hints
 
 Skill: vercel-react-best-practices
 ```
 
-### 5. Branch Naming
+### 5. Ramas (branch naming)
 
 ```
-feature/<descriptive-name>
-fix/<descriptive-name>
-chore/<descriptive-name>
+feature/<nombre-descriptivo>
+fix/<nombre-descriptivo>
+chore/<nombre-descriptivo>
 ```
 
-### 6. Pull Request Checklist
+### 6. Checklist para Pull Request
 
-Before opening a PR, verify:
-- [ ] `npm run build` succeeds (frontend)
-- [ ] `npm test` passes (frontend)
-- [ ] `pytest` passes (backend)
-- [ ] App runs in Docker: `docker compose up --build`
-- [ ] All charts render with sample data
-- [ ] No console errors in browser DevTools
-- [ ] Lighthouse audit passes (target: 90+ accessibility, 80+ performance)
-- [ ] `memory-bank/` updated if baseline quality or workflow changed
+Antes de abrir un PR, verificar:
 
-### 7. Architecture Notes
+- [ ] `npm run build` pasa (frontend)
+- [ ] `npm test` pasa (frontend)
+- [ ] `pytest` pasa (backend)
+- [ ] App funciona en Docker: `docker compose up --build`
+- [ ] Todos los gráficos renderizan con datos de ejemplo
+- [ ] Sin errores en consola del browser (DevTools)
+- [ ] Lighthouse: accesibilidad 90+, rendimiento 80+
+- [ ] `memory-bank/` actualizado si cambió la línea base o el workflow
 
-- **Frontend:** React 19, Vite 8, Tailwind CSS 4, Recharts 3.8, TypeScript strict, shadcn/ui (new-york), Lucide icons
-- **Backend:** FastAPI, Python 3.13, uvicorn, pytest
-- **Data:** SQLite via SQLAlchemy, seeded with 6 months of synthetic data
-- **Styles:** Tailwind CSS 4 with CSS variables for theming; prefers dark mode via `.dark` class on `<main>`
-- **Accessibility:** All charts have `role="img"` with descriptive `aria-label`, skip link for keyboard nav, `aria-live` regions for dynamic KPI values
-- **Layout:** `max-w-7xl` centered container, KPI row with `grid-cols-1` → `xl:grid-cols-4`, charts with `xl:grid-cols-2`
+### 7. Notas de arquitectura (contexto rápido)
 
-### 8. Key Files
+| Capa | Stack |
+|---|---|
+| Frontend | React 19, Vite 8, Tailwind CSS 4, Recharts 3.8, TypeScript strict, shadcn/ui (new-york), Lucide icons |
+| Backend | FastAPI, Python 3.13, uvicorn, pytest |
+| Datos | SQLite via SQLAlchemy, 6 meses de datos sintéticos |
+| Estilos | Tailwind CSS 4 con variables CSS; dark mode via `.dark` class en `<main>` |
+| Accesibilidad | Charts con `role="img"` + `aria-label`, skip link, `aria-live` en KPIs |
+| Layout | `max-w-7xl` centrado, KPIs grid 1→4, charts grid 1→2 (xl) |
 
-| File | Purpose |
-|------|---------|
-| `frontend/src/App.tsx` | Main app (fetch, KPIs, charts, error/loading states) |
-| `frontend/src/components/dashboard/` | Dashboard components (header, KPI cards, charts) |
-| `frontend/src/lib/financial-types.ts` | TypeScript types for FinancialMovement, KPIMetrics, etc. |
-| `frontend/src/lib/financial-utils.ts` | Pure functions: computeKPIs, computeMonthlyData, formatters |
-| `backend/main.py` | FastAPI app, single `/api/metrics` endpoint |
-| `backend/database.py` | SQLite + SQLAlchemy models and seed data |
-| `docker-compose.yml` | Orchestrates frontend + backend containers |
-| `.agents/rules/` | Agent rules for the project (frontend, backend, testing, etc.) |
-| `memory-bank/` | Project documentation (current state, tech stack, product overview) |
+### 8. Archivos clave
 
-## Inputs
+| Archivo | Propósito |
+|---|---|
+| `frontend/src/App.tsx` | App principal (fetch con SWR, KPIs, charts, loading/error/empty) |
+| `frontend/src/components/dashboard/` | Componentes del dashboard (header, KPI cards, charts) |
+| `frontend/src/lib/financial-types.ts` | Tipos TypeScript (FinancialMovement, KPIMetrics, etc.) |
+| `frontend/src/lib/financial-utils.ts` | Funciones puras: computeKPIs, computeMonthlyData, formateadores |
+| `backend/main.py` | FastAPI app, endpoint `/api/metrics` |
+| `backend/database.py` | SQLite + SQLAlchemy modelos y datos de semilla |
+| `docker-compose.yml` | Orquesta frontend + backend |
+| `.agents/rules/` | Reglas del proyecto (frontend, backend, testing, etc.) |
+| `.skills/repo-internal-conventions/SKILL.md` | Skill interna con convenciones específicas del repo |
+| `memory-bank/` | Documentación del proyecto (estado actual, tech stack, overview) |
 
-This skill expects:
-- A working clone of the `ai-eng-financial-dashboard-context-project` repository
-- Node.js 20+ and npm installed
-- Python 3.13+ installed (for backend)
-- Docker Desktop installed (optional, for full stack)
+## Criterios de aceptación
 
-## Outputs
-
-- Consistent, verifiable development workflow
-- Build-verified commits with conventional messages
-- PRs that pass the checklist
-
-## Acceptance Criteria
-
-- [ ] `npm run build` succeeds without errors
-- [ ] `npm test` passes
-- [ ] `pytest` passes
-- [ ] `docker compose up --build` starts both services
-- [ ] Commit messages follow the convention with skill tags
-- [ ] PR template checklist is complete before merge
+- [ ] `npm run build` exitoso sin errores
+- [ ] `npm test` pasa
+- [ ] `pytest` pasa
+- [ ] `docker compose up --build` levanta ambos servicios
+- [ ] Mensajes de commit siguen el formato con skill tags
+- [ ] Checklist del PR completo antes del merge

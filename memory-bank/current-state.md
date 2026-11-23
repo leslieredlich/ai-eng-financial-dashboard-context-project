@@ -22,7 +22,8 @@
 | **`accessibility`** | `addyosmani/web-quality-skills@accessibility` | Título y metadescripción en `index.html`; SkipLink en `App.tsx`; `role="alert"` en error; `aria-label` en regiones; `aria-hidden` en iconos decorativos; `aria-live="polite"` en KPIs dinámicos; `role="img"` con `aria-label` descriptivo en gráficos; `role="status"` en estados vacíos; `aria-labelledby` en charts; `.visually-hidden` class en CSS; media queries `prefers-reduced-motion` y `prefers-contrast: high` |
 | **`vercel-react-best-practices`** | `vercel-labs/agent-skills@vercel-react-best-practices` | `preconnect` y `dns-prefetch` para backend API en `index.html`; verificación de reglas: sin componentes inline, sin barrel imports, sin `&&` en condicionales numéricos |
 | **`performance`** | `addyosmani/web-quality-skills@performance` | Code-splitting con React.lazy+Suspense (597 kB → 243 kB inicial); vendor/charts code splitting en vite.config.ts; React.memo en IncomeOutcomeChart y ProfitPercentChart; hero.png eliminado |
-| **`financial-dashboard-workflow`** | Skill interna del proyecto | `.agents/skills/financial-dashboard-workflow/SKILL.md` — workflow estandarizado de setup, build, test, commits, PR checklist, y notas de arquitectura |
+| **`financial-dashboard-workflow`** | Skill interna del proyecto | `.agents/skills/financial-dashboard-workflow/SKILL.md` — workflow estandarizado de setup, build, test, commits, PR checklist, y notas de arquitectura. Actualizada a v2.0 con formato refinado: YAML frontmatter, objetivo claro, inputs, outputs y criterios de aceptación. |
+| **`repo-internal-conventions`** | Skill interna del proyecto | `.skills/repo-internal-conventions/SKILL.md` — Convenciones específicas del repo que las skills comunitarias no cubren: patrón SWR, timezone en aggregations, Docker healthcheck, shadcn/ui cssVariables, CORS solo para dev, convenciones de componentes, requirements.txt con versiones, assets no usados |
 
 ## Exploración del ecosistema de skills
 
@@ -67,12 +68,13 @@ Y lo mejor: la skill me dio un **objetivo claro** — mantener el JS inicial baj
 
 ## Skills instaladas disponibles
 
-| Skill | Ruta |
-|---|---|
-| `accessibility` | `.agents/skills/accessibility/SKILL.md` |
-| `vercel-react-best-practices` | `.agents/skills/vercel-react-best-practices/SKILL.md` |
-| `performance` | `.agents/skills/performance/SKILL.md` |
-| `financial-dashboard-workflow` | `.agents/skills/financial-dashboard-workflow/SKILL.md` |
+| Skill | Ruta | Origen |
+|---|---|---|
+| `accessibility` | `.agents/skills/accessibility/SKILL.md` | Comunidad (`addyosmani/web-quality-skills`) |
+| `vercel-react-best-practices` | `.agents/skills/vercel-react-best-practices/SKILL.md` | Comunidad (`vercel-labs/agent-skills`) |
+| `performance` | `.agents/skills/performance/SKILL.md` | Comunidad (`addyosmani/web-quality-skills`) |
+| `financial-dashboard-workflow` | `.agents/skills/financial-dashboard-workflow/SKILL.md` | **Interna del proyecto** |
+| `repo-internal-conventions` | `.skills/repo-internal-conventions/SKILL.md` | **Interna del proyecto** |
 
 ## Cambios en accesibilidad (detalle)
 
