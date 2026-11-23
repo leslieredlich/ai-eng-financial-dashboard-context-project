@@ -10,6 +10,26 @@ export default defineConfig({
   optimizeDeps: {
     include: ["lucide-react", "recharts"],
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: "vendor",
+              test: /node_modules[\\/](react|react-dom|swr)/,
+              priority: 20,
+            },
+            {
+              name: "charts",
+              test: /node_modules[\\/]recharts/,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
+  },
   server: {
     host: "0.0.0.0",
     proxy: {

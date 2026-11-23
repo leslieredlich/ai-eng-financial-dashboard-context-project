@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -64,7 +65,7 @@ const IncomeOutcomeNoData = (
   </div>
 )
 
-export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
     return IncomeOutcomeSkeleton
   }
@@ -131,4 +132,6 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
       </CardContent>
     </Card>
   )
-}
+})
+
+export default IncomeOutcomeChart

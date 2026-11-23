@@ -1,9 +1,7 @@
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import useSWR from "swr";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
-import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
-import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
   type FinancialMovement,
   type MonthlyDataPoint,
@@ -13,6 +11,9 @@ import {
   computeMonthlyData,
   formatPeriodLabel,
 } from "@/lib/financial-utils";
+
+const IncomeOutcomeChart = lazy(() => import("@/components/dashboard/income-outcome-chart"));
+const ProfitPercentChart = lazy(() => import("@/components/dashboard/profit-percent-chart"));
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -77,13 +78,15 @@ function App() {
               <KPIRow metrics={metrics} loading={isLoading} />
             </section>
 
-            <section
-              aria-label="Financial charts"
-              className="grid grid-cols-1 gap-4 xl:grid-cols-2"
-            >
-              <IncomeOutcomeChart data={monthlyData} loading={isLoading} />
-              <ProfitPercentChart data={monthlyData} loading={isLoading} />
-            </section>
+            <Suspense fallback={<div className="sr-only">Loading charts…</div>}>
+              <section
+                aria-label="Financial charts"
+                className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+              >
+                <IncomeOutcomeChart data={monthlyData} loading={isLoading} />
+                <ProfitPercentChart data={monthlyData} loading={isLoading} />
+              </section>
+            </Suspense>
           </div>
         </div>
       </main>

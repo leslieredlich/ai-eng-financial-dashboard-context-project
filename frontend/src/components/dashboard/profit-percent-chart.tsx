@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -65,7 +66,7 @@ const ProfitPercentNoData = (
   </div>
 )
 
-export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
+const ProfitPercentChart = memo(function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   if (loading) {
     return ProfitPercentSkeleton
   }
@@ -120,4 +121,6 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
       </CardContent>
     </Card>
   )
-}
+})
+
+export default ProfitPercentChart
