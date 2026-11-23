@@ -1,6 +1,7 @@
-fastapi
-uvicorn[standard]
-debugpy
-pytest
-pytest-cov
-httpx
+fastapi==0.162.4
+uvicorn[standard]==0.54.0
+sqlalchemy==2.0.40
+debugpy==1.8.22
+pytest==9.2.0
+pytest-cov==7.1.0
+httpx==0.28.1
