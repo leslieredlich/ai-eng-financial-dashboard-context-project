@@ -24,6 +24,37 @@
 | **`performance`** | `addyosmani/web-quality-skills@performance` | Code-splitting con React.lazy+Suspense (597 kB → 243 kB inicial); vendor/charts code splitting en vite.config.ts; React.memo en IncomeOutcomeChart y ProfitPercentChart; hero.png eliminado |
 | **`financial-dashboard-workflow`** | Skill interna del proyecto | `.agents/skills/financial-dashboard-workflow/SKILL.md` — workflow estandarizado de setup, build, test, commits, PR checklist, y notas de arquitectura |
 
+## Exploración del ecosistema de skills
+
+### Skills evaluadas con `npx skills find`
+
+| Tema | Comando | Candidatos destacados |
+|---|---|---|
+| Rendimiento | `npx skills find performance` | **addyosmani/web-quality-skills@performance** (1.4M installs, 46.2K ⭐) |
+| Testing | `npx skills find testing` | `antfu/skills@vitest` (49.2K installs), `anthropics/skills@webapp-testing` |
+| TypeScript | `npx skills find typescript` | `wshobson/agents@typescript-advanced-types` |
+| SEO | `npx skills find seo` | `addyosmani/web-quality-skills@seo`, `firecrawl/firecrawl-workflows@firecrawl-seo-audit` |
+
+### Justificación — skill `performance` seleccionada
+
+De las skills evaluadas, se seleccionó **`addyosmani/web-quality-skills@performance`** por las siguientes razones:
+
+1. **Ecosistema unificado**: Pertenece al mismo repositorio (`addyosmani/web-quality-skills`) que la skill `accessibility` ya aplicada. Ambas skills comparten estructura de reglas, formato de auditoría y criterios de verificación — lo que reduce fricción al aplicarlas secuencialmente y hace que los resultados sean consistentes.
+
+2. **Stack-agnostic pero aplicable**: La skill audita Core Web Vitals (LCP, CLS, INP), bundle size analysis, optimización de recursos y patrones de renderizado. Todo esto es relevante para cualquier SPA de React, incluyendo este dashboard con Vite + Recharts.
+
+3. **Complementariedad**: Mientras `vercel-react-best-practices` cubrió patrones de código (useSWR, memo, barrel imports), `performance` cubre la métrica real de rendimiento en producción — tamaño de bundle, carga diferida de módulos pesados y separación de vendor chunks.
+
+4. **Métrica objetiva**: La skill establece un budget de 300 kB para JS inicial. Nuestro bundle inicial medía 597 kB. Después de aplicar la skill, bajó a ~243 kB — evidencia clara de mejora medible.
+
+### Skills consideradas pero no seleccionadas
+
+| Skill | Motivo para no seleccionar |
+|---|---|
+| `antfu/skills@vitest` | El proyecto ya tiene 8 tests con Vitest. La skill sería útil para expandir la cobertura, pero el foco del ejercicio es mejorar el codebase existente antes de añadir tests nuevos. Queda como recomendación para el roadmap. |
+| `addyosmani/web-quality-skills@seo` | Este dashboard es una herramienta interna de finanzas, no un sitio público. SEO no es una prioridad actual. |
+| `wshobson/agents@typescript-advanced-types` | El proyecto ya corre con TypeScript strict. La skill añadiría patrones avanzados, pero no hay un problema concreto de tipos que resolver ahora. |
+
 ## Skills instaladas disponibles
 
 | Skill | Ruta |
